@@ -27,6 +27,8 @@ streamlit run app.py
 - Белгіленген деректе Dummy baseline, Random Forest және HistGradientBoosting бірдей train/test бөлінісінде салыстырылады. Macro precision, recall, F1 және confusion matrix көрсетіледі.
 - Белгі бағанын таңдамағанда Isolation Forest аномалияға ұқсас жолдарды жоғары ұпай бойынша көрсетеді.
 - Үлкен файлдарда параметрлер панелінен оқытуға алынатын жол санын азайт.
+- 50 MB-тан үлкен CSV файл chunk арқылы оқылады; интерфейс үшін ең көбі 50 000 жол іріктеледі. Іріктеу туралы хабарлама көрсетіледі, метрикалар сол іріктемеге есептеледі.
+- Streamlit жүктеу шегі `.streamlit/config.toml` файлында 512 MB етіп орнатылған.
 
 ## Деректер жиыны
 
@@ -37,6 +39,7 @@ streamlit run app.py
 ```text
 app.py             # Streamlit интерфейсі және ML ағыны
 assets/            # Голографиялық басты бет иллюстрациясы
+.streamlit/        # Streamlit сервер параметрлері
 requirements.txt   # Python тәуелділіктері
 README.md          # Осы нұсқаулық
 ```
