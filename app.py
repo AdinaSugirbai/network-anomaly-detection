@@ -67,11 +67,7 @@ st.markdown("""
 .nw-hero-desc{font-size:16px;line-height:1.75;color:#786989;max-width:460px}
 .nw-hero-points{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.nw-hero-point{border:1px solid #e6dced;background:rgba(255,255,255,.58);border-radius:20px;padding:9px 12px;font-size:12px;color:#735d87}
 .nw-hero-art{width:100%;height:auto;display:block;filter:drop-shadow(0 16px 30px rgba(102,77,143,.13));border-radius:22px}
-.nw-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 20px}
-.nw-info-card{border:1px solid #e3d8ed;background:rgba(255,255,255,.72);border-radius:18px;padding:17px 18px;box-shadow:0 10px 28px rgba(88,66,117,.06)}
-.nw-info-card b{display:block;color:#49365f;font-size:15px;margin:0 0 7px}.nw-info-card span{font-size:13px;line-height:1.55;color:#786b84}
 @media(max-width:850px){.nw-hero{grid-template-columns:1fr;padding:20px}.nw-hero-title{font-size:31px}}
-@media(max-width:850px){.nw-info-grid{grid-template-columns:1fr}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -149,15 +145,22 @@ if uploaded:
 else:
     df = make_demo_data()
     source_rows, was_sampled = len(df), False
-    data_origin = "Синтетикалық демо дерек"
+    data_origin = "Сынақ дерегі · синтетикалық үлгі"
 
 # Drop empty and duplicate columns safely; preserve the unmodified row index for display.
 df = df.loc[:, ~df.columns.duplicated()].copy()
 df = df.dropna(axis=1, how="all")
 
-st.markdown("<div class='nw-kicker'>КИБЕРҚАУІПСІЗДІК · МАШИНАЛЫҚ ОҚЫТУ</div>", unsafe_allow_html=True)
-st.markdown("<div class='nw-title'>Қауіпті ерте байқа.</div><div class='nw-sub'>Желі белсенділігін бақыла · күмәнді ағындарды анықта · нәтижені түсіндір</div>", unsafe_allow_html=True)
-st.markdown(f"<div style='margin:14px 0 20px'><span class='nw-chip'>◉ {data_origin}</span>　<span class='nw-chip'>ТАЛДАУ ЗЕРТХАНАСЫ · 01</span></div>", unsafe_allow_html=True)
+if page == "Басты бет":
+    st.markdown("<div class='nw-kicker'>NIGHTWATCH · ЖЕЛІ ҚАУІПСІЗДІГІ</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-title'>Күмәнді желілік әрекеттер</div><div class='nw-sub'>CSV трафигін шолыңыз және модель тексеруге ұсынған қосылымдарды қараңыз.</div>", unsafe_allow_html=True)
+elif page == "Деректер зертханасы":
+    st.markdown("<div class='nw-kicker'>NIGHTWATCH · ДЕРЕКТЕР</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-title'>Деректер зертханасы</div><div class='nw-sub'>Файлдың жолдарын, бағандарын және бос ұяшықтарын тексеріңіз.</div>", unsafe_allow_html=True)
+else:
+    st.markdown("<div class='nw-kicker'>NIGHTWATCH · ЖОБА</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-title'>Жоба туралы</div><div class='nw-sub'>Жобаның мақсаты, дерек көзі және модельдердің шектеулері.</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='margin:12px 0 16px'><span class='nw-chip'>ДЕРЕК КӨЗІ · {data_origin}</span></div>", unsafe_allow_html=True)
 if was_sampled:
     st.info(f"Файл көлемі үлкен болғандықтан, талдау үшін {len(df):,} жол кездейсоқ іріктелді (файлда барлығы {source_rows:,} жол). Метрикалар осы іріктемеге есептеледі.")
 
@@ -167,43 +170,29 @@ if page == "Басты бет":
     st.markdown(f"""
     <section class="nw-hero">
       <div class="nw-hero-copy">
-        <div class="nw-hero-eyebrow">ЖЕЛІ ТАЛДАУЫ · ҚОРҒАНЫС РЕЖИМІ</div>
-        <div class="nw-hero-title">Күдікті ағынды<br>дер кезінде байқа.</div>
-        <div class="nw-hero-desc">CSV файлды жүкте. Nightwatch желі қосылымдарын талдап, қалыптан тыс ағындарды бөлек көрсетеді. Әр ескертуді маман тексеріп, шешім қабылдай алады.</div>
-        <div class="nw-hero-points"><span class="nw-hero-point">✦ Күдікті оқиғалар</span><span class="nw-hero-point">◌ 3 модельді салыстыру</span><span class="nw-hero-point">⌁ Себебін түсіндіру</span></div>
+        <div class="nw-hero-eyebrow">ЖҮКТЕЛГЕН CSV · ОҚУ ДЕМОСЫ</div>
+        <div class="nw-hero-title">Желі ағындарын<br>бір жерден шолыңыз.</div>
+        <div class="nw-hero-desc">Жүйе файлдағы қосылымдарды талдайды. Белгіленген деректе үш модель салыстырылады; белгі жоқ болса, Isolation Forest ерекше ағындарды жеке көрсетеді. Бұл нақты уақыттағы мониторинг емес.</div>
+        <div class="nw-hero-points"><span class="nw-hero-point">CSV дерегі</span><span class="nw-hero-point">3 модель салыстыруы</span><span class="nw-hero-point">Бөлек ескерту тізімі</span></div>
       </div>
       <img class="nw-hero-art" alt="Голографиялық планета мен желі байланыстарын көрсететін иллюстрация" src="data:image/svg+xml;base64,{hero_b64}" />
     </section>
     """, unsafe_allow_html=True)
-    st.markdown("""
-    <section class="nw-info-grid">
-      <div class="nw-info-card"><b>🛰️ Не бақыланады?</b><span>Қосылым ұзақтығы, пакет саны, байт көлемі және жылдамдық сияқты желі белгілері.</span></div>
-      <div class="nw-info-card"><b>🚨 Күдікті оқиға қайда?</b><span>Талдаудан кейін күмәнді деп белгіленген ағындар жеке кестеде шығады. Әр жолды маман тексереді.</span></div>
-      <div class="nw-info-card"><b>🧠 Қалай тексереміз?</b><span>Белгіленген деректе үш модель салыстырылады; белгі жоқ болса, Isolation Forest аномалияларды іздейді.</span></div>
-    </section>
-    """, unsafe_allow_html=True)
-    cta1, cta2 = st.columns([1, 2])
-    with cta1:
-        if st.button("🧪 Деректер зертханасын ашу", use_container_width=True):
-            st.session_state["nav_page"] = "Деректер зертханасы"
-            st.rerun()
-    with cta2:
-        st.caption("Практикалық пайдасы: желі әкімшісі осы панель арқылы қолмен тексеруге қажет қосылымдарды тез іріктей алады. Демо белгісі шабуылдың дәлелі болып саналмайды.")
 
 if page == "Жоба жайлы":
-    st.markdown("### Бұл құрал не үшін керек?")
-    st.write("Nightwatch желілік қосылымдардың ұзақтығын, пакет санын және дерек көлемін талдап, өзгеше көрінген ағындарды қауіпсіздік маманының назарына ұсынады. Бұл — оқу жобасының прототипі: ол шабуылды өздігінен тоқтатпайды және күмәнді деп белгіленген трафикті міндетті түрде маман тексеруі керек.")
-    st.markdown("#### Жоба қалай жұмыс істейді?")
+    st.markdown("### Құралдың мақсаты")
+    st.write("Nightwatch жүктелген CSV файлындағы желі ағындарын талдап, модель күмәнді деп белгілеген жолдарды көрсетеді. Жоба трафикті тоқтатпайды; әр ескертуді маман тексеруі керек.")
+    st.markdown("#### Жұмыс тәртібі")
     st.markdown("1. **Дерек жүктеу:** CIC-IDS2017 CSV файлын таңда.\n2. **Деректі шолу:** кластарды, бос мәндерді және белгілерді қара.\n3. **Модельді іске қосу:** белгісі бар деректе қарапайым бастапқы үлгі, Random Forest және Gradient Boosting салыстырылады.\n4. **Күдікті ағындарды қарау:** аномалия режимінде Isolation Forest сирек үлгілерді бөлек көрсетеді.\n5. **Қорытынды жасау:** дәлдік, нақтылық, толықтық, F1 өлшемі және қате болжамдарын талда.")
-    st.markdown("#### Кімге пайдалы?")
-    st.write("Желі әкімшілеріне ықтимал қауіпті қосылымдарды шолуға, ал студенттерге аномалияны анықтау мен жіктеудің айырмасын тәжірибе жүзінде түсінуге көмектеседі.")
+    st.markdown("#### Кім қолдана алады?")
+    st.write("Студенттер модельдерді салыстырып, аномалияны анықтау тәсілін үйрене алады. Желі маманы күмәнді деп белгіленген жолдарды бастапқы тексеруге пайдалана алады.")
     st.markdown("#### Дерек көзі")
     st.markdown("[CIC-IDS2017 ресми деректер беті — Канаданың киберқауіпсіздік институты](https://www.unb.ca/cic/datasets/ids-2017.html)")
     st.info("Шектеуі: дерек жиыны зертханалық ортада жиналған. Нәтиже нақты желідегі дәлдікті кепілдемейді; сынып теңгерімсіздігі мен қате дабылдарды міндетті түрде талдау керек.")
     st.stop()
 
 if page == "Деректер зертханасы":
-    st.markdown("### 🧪 Деректер зертханасы")
+    st.markdown("### Файл мазмұны")
     st.caption("Дерек көлемін, бағандарды, бос мәндерді және сандық белгілердің үлестірімін тексер. Үлкен файлда талдау жылдамырақ болуы үшін үлгі қолданылады.")
     left, right = st.columns([1.45, 1])
     with left:
@@ -214,7 +203,7 @@ if page == "Деректер зертханасы":
         st.metric("Баған саны", f"{df.shape[1]:,}")
         st.metric("Бос ұяшық саны", f"{int(df.isna().sum().sum()):,}")
         if not numeric.empty:
-            feature = st.selectbox("Белгінің үлестірімін көру", numeric.columns)
+            feature = st.selectbox("Сандық бағанды таңдаңыз", numeric.columns)
             fig = px.histogram(df, x=feature, nbins=35, color_discrete_sequence=["#da69d7"])
             st.plotly_chart(style_fig(fig, 260), use_container_width=True)
     st.stop()
@@ -222,8 +211,8 @@ if page == "Деректер зертханасы":
 # Main overview
 numeric = df.select_dtypes(include=np.number).replace([np.inf, -np.inf], np.nan)
 label_candidates = [c for c in df.columns if c.lower() in {"label", "class", "attack", "target", "category"}]
-with st.expander("⚙️ Талдау параметрлері", expanded=False):
-    label_col = st.selectbox("Нәтиже белгісі бар баған", ["Белгісіз аномалияны іздеу"] + list(df.columns), index=(1 + df.columns.get_loc(label_candidates[0])) if label_candidates else 0)
+with st.expander("Сүзгілер мен талдау параметрлері", expanded=True):
+    label_col = st.selectbox("Класс немесе шабуыл белгісі бар баған", ["Белгісіз аномалияны іздеу"] + list(df.columns), index=(1 + df.columns.get_loc(label_candidates[0])) if label_candidates else 0)
     max_rows = st.slider("Модельге алынатын жол саны", 1000, 30000, 12000, 1000)
     normal_label = None
     if label_col != "Белгісіз аномалияны іздеу":
@@ -238,45 +227,61 @@ with st.expander("⚙️ Талдау параметрлері", expanded=False)
 has_label = label_col != "Белгісіз аномалияны іздеу"
 if has_label:
     n_classes = df[label_col].nunique(dropna=True)
-    st.markdown("<div class='nw-note'>Белгіленген режим: қарапайым бастапқы үлгі Random Forest және Gradient Boosting модельдерімен салыстырылады. Нысана бағаны модельге кірмейді.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-note'>Режим: белгіленген дерек. Бастапқы үлгі, Random Forest және Gradient Boosting салыстырылады.</div>", unsafe_allow_html=True)
 else:
     n_classes = 0
-    st.markdown("<div class='nw-note'>Аномалия режимі: Isolation Forest сирек әрі өзгеше қосылымдарды белгілейді. Нақты жауап белгісі жоқ кезде сапа метрикалары есептелмейді.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-note'>Режим: белгісіз аномалияны іздеу. Isolation Forest ерекше ағындарды белгілейді; нақты жауап белгісі болмаса, сапа метрикалары есептелмейді.</div>", unsafe_allow_html=True)
 
 # Summary strip
 s1,s2,s3,s4=st.columns(4)
-s1.metric("ТАЛДАНҒАН ЖОЛ", f"{len(df):,}")
-s2.metric("САНДЫҚ КӨРСЕТКІШ", f"{numeric.shape[1]:,}")
-s3.metric("БЕЛГІЛЕНГЕН КЛАС", f"{n_classes:,}" if has_label else "Жоқ")
-s4.metric("БОС ҰЯШЫҚ", f"{int(df.isna().sum().sum()):,}")
+s1.metric("Талдаудағы жол", f"{len(df):,}")
+s2.metric("Сандық баған", f"{numeric.shape[1]:,}")
+s3.metric("Класс саны", f"{n_classes:,}" if has_label else "Белгі жоқ")
+s4.metric("Бос ұяшық", f"{int(df.isna().sum().sum()):,}")
+
+port_aliases = {"destination port", "dst port", "dest port", "destination_port", "dst_port"}
+protocol_aliases = {"protocol", "proto"}
+port_col = next((c for c in df.columns if c.strip().lower() in port_aliases), None)
+protocol_col = next((c for c in df.columns if c.strip().lower() in protocol_aliases), None)
 
 left, right = st.columns([1.45, 1], gap="large")
 with left:
-    st.markdown("#### ◉ Трафик санаттары")
-    if has_label:
-        counts = df[label_col].fillna("Бос мән").astype(str).value_counts().head(12).rename_axis("Санат").reset_index(name="Ағын саны")
-        fig=px.bar(counts, x="Ағын саны", y="Санат", orientation="h", color="Ағын саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
-        fig.update_layout(coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
-        st.plotly_chart(style_fig(fig, 315), use_container_width=True)
-    elif not numeric.empty:
-        feat=numeric.columns[:min(5,len(numeric.columns))].tolist()
-        trend=df[feat].head(120).reset_index(drop=True).reset_index(names="Ағын №")
-        fig=px.line(trend, x="Ағын №", y=feat, color_discrete_sequence=["#f15fca","#8b69ff","#5de0c7","#ffba69","#7aaeff"])
-        st.plotly_chart(style_fig(fig,315), use_container_width=True)
-    else:
-        st.info("График құру үшін сандық бағандар қажет.")
+    with st.container(border=True):
+        st.markdown("#### Трафик кластары")
+        if has_label:
+            counts = df[label_col].fillna("Бос мән").astype(str).value_counts().head(12).rename_axis("Класс атауы").reset_index(name="Қосылым саны")
+            fig=px.bar(counts, x="Қосылым саны", y="Класс атауы", orientation="h", color="Қосылым саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
+            fig.update_layout(coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
+            st.plotly_chart(style_fig(fig, 315), use_container_width=True)
+        elif not numeric.empty:
+            feat=numeric.columns[:min(5,len(numeric.columns))].tolist()
+            trend=df[feat].head(120).reset_index(drop=True).reset_index(names="Жол реті")
+            fig=px.line(trend, x="Жол реті", y=feat, color_discrete_sequence=["#f15fca","#8b69ff","#5de0c7","#ffba69","#7aaeff"])
+            st.plotly_chart(style_fig(fig,315), use_container_width=True)
+        else:
+            st.info("График құру үшін сандық бағандар қажет.")
 with right:
-    st.markdown("#### ✦ Қауіп радары")
-    if has_label:
-        counts=df[label_col].fillna("Бос").astype(str).value_counts()
-        pie=go.Figure(go.Pie(labels=counts.index[:8],values=counts.values[:8],hole=.72,marker_colors=["#ff62c7","#9567f5","#62e9d0","#ffbd69","#679aff","#bf71ff","#e8818f","#708295"],textinfo="none"))
-        pie.add_annotation(text=f"{len(df):,}<br><span style='font-size:10px'>ағын</span>",x=.5,y=.5,showarrow=False,font=dict(size=23,color="#fff0ff"))
-        st.plotly_chart(style_fig(pie,260), use_container_width=True)
-    else:
-        st.markdown("<div class='nw-card'><div class='nw-kicker'>АНОМАЛИЯНЫ АНЫҚТАУ</div><h2 style='margin:.6rem 0;color:#49365f'>Isolation Forest</h2><div class='nw-note'>Белгісі жоқ желі деректерінен сирек әрі ерекшеленетін қосылымдарды іздейді. Күдікті белгі — тексеруге арналған ескерту.</div></div>", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("#### Желілік қызметтер")
+        service_col = port_col or protocol_col
+        if service_col:
+            service_title = "Тағайындалған порттар" if service_col == port_col else "Протоколдар"
+            services = df[service_col].fillna("Белгісіз").astype(str).value_counts().head(10).rename_axis("Қызмет").reset_index(name="Қосылым саны")
+            service_fig = px.bar(services, x="Қосылым саны", y="Қызмет", orientation="h", color="Қосылым саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
+            service_fig.update_layout(title=service_title, coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
+            st.plotly_chart(style_fig(service_fig,260), use_container_width=True)
+            st.caption("Ең жиі кездесетін 10 мән.")
+        elif has_label:
+            counts=df[label_col].fillna("Белгісіз").astype(str).value_counts()
+            pie=go.Figure(go.Pie(labels=counts.index[:8],values=counts.values[:8],hole=.72,marker_colors=["#ff62c7","#9567f5","#62e9d0","#ffbd69","#679aff","#bf71ff","#e8818f","#708295"],textinfo="label+percent"))
+            pie.add_annotation(text=f"{len(df):,}<br><span style='font-size:10px'>жол</span>",x=.5,y=.5,showarrow=False,font=dict(size=23,color="#fff0ff"))
+            st.plotly_chart(style_fig(pie,260), use_container_width=True)
+            st.caption("Деректегі класс үлесі.")
+        else:
+            st.markdown("<div class='nw-card'><div class='nw-kicker'>ТАҢДАЛҒАН ӘДІС</div><h2 style='margin:.6rem 0;color:#49365f'>Isolation Forest</h2><div class='nw-note'>Белгі қойылмаған трафиктен өзгеше ағындарды анықтап, тексеру тізіміне қосады.</div></div>", unsafe_allow_html=True)
 
-st.markdown("#### ⚡ Модель зертханасы")
-run = st.button("▶　Трафикті талдау", type="primary", use_container_width=False)
+st.markdown("#### Модель нәтижелері")
+run = st.button("Талдауды бастау", type="primary", use_container_width=False)
 if run:
     if numeric.shape[1] == 0:
         st.error("Модельге жарайтын сандық белгі бағаны табылмады.")
@@ -289,7 +294,7 @@ if run:
         X = clean.select_dtypes(include=np.number).replace([np.inf,-np.inf], np.nan)
         X = X.fillna(X.median()).clip(lower=-1e12, upper=1e12)
         if has_label:
-            y_raw=clean[label_col].fillna("Unknown").astype(str)
+            y_raw=clean[label_col].fillna("Белгісіз").astype(str)
             mask=y_raw.value_counts()[y_raw].values >= 2
             X=X.loc[mask].drop(columns=[label_col], errors="ignore"); y_raw=y_raw.loc[mask]
             if y_raw.nunique()<2:
@@ -304,11 +309,11 @@ if run:
                 for i,(name,model) in enumerate(models.items()):
                     start=time.perf_counter(); model.fit(Xtr,ytr); pred=model.predict(Xte); timings[name]=time.perf_counter()-start
                     predictions[name]=pred
-                    results.append({"Модель":name,"Дәлдік":accuracy_score(yte,pred),"Precision · нақтылық":precision_score(yte,pred,average="macro",zero_division=0),"Recall · толықтық":recall_score(yte,pred,average="macro",zero_division=0),"F1 өлшемі":f1_score(yte,pred,average="macro",zero_division=0),"Оқыту, сек":round(timings[name],2)})
+                    results.append({"Модель":name,"Дәлдік":accuracy_score(yte,pred),"Нақтылық (Precision)":precision_score(yte,pred,average="macro",zero_division=0),"Толықтық (Recall)":recall_score(yte,pred,average="macro",zero_division=0),"F1 өлшемі":f1_score(yte,pred,average="macro",zero_division=0),"Оқыту, сек":round(timings[name],2)})
                     progress.progress((i+1)/len(models))
                 res=pd.DataFrame(results).sort_values("F1 өлшемі",ascending=False)
-                st.success(f"Салыстыру аяқталды · тест жиынында {len(Xte):,} жол")
-                st.dataframe(res.style.format({c:"{:.3f}" for c in ["Дәлдік","Precision · нақтылық","Recall · толықтық","F1 өлшемі"]}),use_container_width=True,hide_index=True)
+                st.success(f"Модельдерді салыстыру аяқталды. Тексерілген жол: {len(Xte):,}.")
+                st.dataframe(res.style.format({c:"{:.3f}" for c in ["Дәлдік","Нақтылық (Precision)","Толықтық (Recall)","F1 өлшемі"]}),use_container_width=True,hide_index=True)
                 chosen=st.selectbox("Нәтижесін және күдікті болжамдарын қарайтын модель",list(models.keys()),index=list(models.keys()).index(res.iloc[0]["Модель"]))
                 cm=confusion_matrix(yte,predictions[chosen])
                 cf=px.imshow(cm,text_auto=True,x=[str(c) for c in enc.classes_],y=[str(c) for c in enc.classes_],color_continuous_scale=[[0,"#1a1423"],[1,"#ed57bd"]],labels=dict(x="Болжанған класс",y="Нақты класс",color="Саны"),aspect="auto")
@@ -316,7 +321,7 @@ if run:
                 predicted_labels=enc.inverse_transform(predictions[chosen]).astype(str)
                 actual_labels=enc.inverse_transform(yte).astype(str)
                 normal_value=normal_label if normal_label and normal_label != "Автоматты анықтау" else next((str(c) for c in enc.classes_ if str(c).strip().upper() in {"BENIGN","BENIGN TRAFFIC","NORMAL","NORMAL TRAFFIC","0"}), None)
-                st.markdown("#### 🚨 Күдікті деп белгіленген қосылымдар")
+                st.markdown("#### Күдікті деп белгіленген қосылымдар")
                 if normal_value is None:
                     st.warning("Қалыпты трафик класы автоматты анықталмады. Сол жақтағы «Талдау параметрлері» бөлімінен қалыпты классты таңдасаң, қалған болжамдар осы тізімге шығады.")
                 else:
@@ -327,7 +332,7 @@ if run:
                     if alerts.empty:
                         st.success("Тест жиынында күдікті деп белгіленген қосылым жоқ.")
                     else:
-                        st.warning(f"Модель қалыпты кластан бөлек {len(alerts):,} қосылымды белгіледі. Бұл — тексеруді қажет ететін болжам.")
+                        st.warning(f"Қалыпты емес деп болжанған қосылым саны: {len(alerts):,}. Әр жолды тексеріңіз.")
                         st.dataframe(alerts.head(100),use_container_width=True,hide_index=True)
                 st.caption("Ескерту: тест бөлінісі жүктелген файлдан алынған. Жолдардың уақыты ескерілмесе, жаңа желідегі сапа бұдан төмен болуы мүмкін. Болжам шабуылдың дәлелі емес.")
         else:
@@ -347,7 +352,7 @@ if run:
                         ["Жоғары","Орташа"],default="Қарау керек")
                 st.success(f"Талдау аяқталды · {len(X):,} ағын · {elapsed:.2f} сек")
                 a,b,c=st.columns(3); a.metric("Күмәнді белгі",f"{len(flagged):,}"); b.metric("Қалыпты белгі",f"{len(X)-len(flagged):,}"); c.metric("Үлес",f"{len(flagged)/len(X):.1%}")
-                st.markdown("#### 🚨 Күдікті қосылымдар жеке тізімі")
+                st.markdown("#### Күдікті қосылымдар")
                 st.caption("Тексеру басымдығы аномалия ұпайының осы файлдағы үлестіріміне сүйенеді. Бұл баға қауіптің нақты деңгейін немесе шабуылды дәлелдемейді.")
                 st.dataframe(flagged.head(100),use_container_width=True,hide_index=True)
 
