@@ -59,6 +59,11 @@ st.markdown("""
 [data-testid="stFileUploader"]{background:rgba(255,255,255,.72)!important;border:1px dashed #c4add9!important}
 [data-testid="stFileUploaderDropzone"]{background:rgba(255,255,255,.82)!important;border:1px dashed #c4add9!important}
 [data-testid="stFileUploaderDropzone"] *{color:#68547d!important}
+[data-testid="stFileUploaderDropzone"] button{min-width:142px;position:relative!important;overflow:hidden!important;background:#fff!important}
+[data-testid="stFileUploaderDropzone"] button::before{content:"";position:absolute;inset:1px;border-radius:8px;background:#fff;z-index:1;pointer-events:none}
+[data-testid="stFileUploaderDropzone"] button::after{content:"Файлды таңдау";font-size:14px;color:#68547d!important;position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
+[data-testid="stFileUploaderDropzoneInstructions"]{display:none!important}
+[data-testid="stFileUploaderDropzone"] small{display:none!important}
 [data-testid="stDataFrame"]{border:1px solid #e4dced!important}
 [data-testid="stExpander"]{background:rgba(255,255,255,.78)!important;border:1px solid #e3d8ed!important;border-radius:16px!important;overflow:hidden}
 [data-testid="stExpander"] summary,[data-testid="stExpander"] summary p{background:transparent!important;color:#49365f!important}
@@ -69,13 +74,7 @@ header[data-testid="stHeader"]{background:transparent!important}
 .nw-kicker{color:#8a63ac!important}.nw-title{color:#352746!important}.nw-sub{color:#776989!important}
 .nw-chip{border-color:#e3d8ed!important;background:rgba(255,255,255,.6)!important;color:#68547d!important}
 .nw-card{background:rgba(255,255,255,.7)!important;border-color:#e3d8ed!important}.nw-note{color:#786b84!important}
-.nw-hero{display:grid;grid-template-columns:.86fr 1.14fr;gap:14px;align-items:center;margin:8px 0 16px;padding:18px 24px;border:1px solid rgba(255,255,255,.92);border-radius:24px;background:linear-gradient(125deg,rgba(255,255,255,.88),rgba(246,239,252,.72) 55%,rgba(230,239,250,.76));box-shadow:0 16px 42px rgba(90,69,123,.10);overflow:hidden}
-.nw-hero-copy{padding:10px 0 12px 8px}.nw-hero-eyebrow{font:12px Consolas,monospace;letter-spacing:1.5px;color:#936bac}
-.nw-hero-title{font-family:Georgia,'Source Serif',serif;font-size:33px;line-height:1.12;letter-spacing:-1.2px;font-weight:800;color:#38294c;margin:10px 0 9px}
-.nw-hero-desc{font-size:14px;line-height:1.6;color:#786989;max-width:460px}
-.nw-hero-points{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.nw-hero-point{border:1px solid #e6dced;background:rgba(255,255,255,.58);border-radius:20px;padding:9px 12px;font-size:12px;color:#735d87}
-.nw-hero-art{width:100%;height:auto;max-height:260px;object-fit:contain;display:block;filter:drop-shadow(0 16px 30px rgba(102,77,143,.13));border-radius:22px}
-@media(max-width:850px){.nw-hero{grid-template-columns:1fr;padding:20px}.nw-hero-title{font-size:31px}}
+.nw-panel-art{width:100%;height:auto;max-height:190px;object-fit:contain;display:block;margin:0 auto 8px;filter:drop-shadow(0 12px 22px rgba(102,77,143,.11));border-radius:18px}
 </style>
 """, unsafe_allow_html=True)
 
@@ -92,7 +91,7 @@ def make_demo_data(n: int = 1800) -> pd.DataFrame:
                          "Flow Bytes/s": byte_count / np.maximum(duration, .01),
                          "Flow Packets/s": rate,
                          "Average Packet Size": byte_count / np.maximum(packets, 1),
-                         "Label": np.where(y == 1, "Attack", "Benign")})
+                         "Label": np.where(y == 1, "Шабуыл", "Қалыпты")})
 
 @st.cache_data(show_spinner=False)
 def read_csv_bytes(data: bytes, sample_limit: int = 50000) -> tuple[pd.DataFrame, int, bool]:
@@ -136,7 +135,7 @@ with st.sidebar:
     page = st.radio("Бөлімді таңда", ["Басты бет", "Деректер зертханасы", "Жоба жайлы"], label_visibility="collapsed", key="nav_page")
     st.markdown("**📂 Трафик файлы**")
     uploaded = st.file_uploader("CSV файлын таңда", type=["csv"], help="CIC-IDS2017 сияқты желілік ағын деректерінің CSV файлы", label_visibility="collapsed", key="traffic_csv")
-    st.caption("Жүктелген файл тек осы талдауда қолданылады.")
+    st.caption("CSV · 512 МБ-қа дейін · файл осы талдауға ғана қолданылады.")
     st.divider()
     st.markdown("**◉ Талдау жүйесі дайын**")
     st.caption("Машиналық оқыту · интерактивті демо")
@@ -161,7 +160,7 @@ df = df.dropna(axis=1, how="all")
 
 if page == "Басты бет":
     st.markdown("<div class='nw-kicker'>NIGHTWATCH · ЖЕЛІ ҚАУІПСІЗДІГІ</div>", unsafe_allow_html=True)
-    st.markdown("<div class='nw-title'>Күмәнді желілік әрекеттер</div><div class='nw-sub'>CSV трафигін шолыңыз және модель тексеруге ұсынған қосылымдарды қараңыз.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='nw-title'>Желілік оқиғалар панелі</div><div class='nw-sub'>CSV трафигі, модель көрсеткіштері және күдікті қосылымдар.</div>", unsafe_allow_html=True)
 elif page == "Деректер зертханасы":
     st.markdown("<div class='nw-kicker'>NIGHTWATCH · ДЕРЕКТЕР</div>", unsafe_allow_html=True)
     st.markdown("<div class='nw-title'>Деректер зертханасы</div><div class='nw-sub'>Файлдың жолдарын, бағандарын және бос ұяшықтарын тексеріңіз.</div>", unsafe_allow_html=True)
@@ -175,17 +174,6 @@ if was_sampled:
 if page == "Басты бет":
     hero_path = Path(__file__).parent / "assets" / "orbit-hero.svg"
     hero_b64 = base64.b64encode(hero_path.read_bytes()).decode("ascii")
-    st.markdown(f"""
-    <section class="nw-hero">
-      <div class="nw-hero-copy">
-        <div class="nw-hero-eyebrow">ЖҮКТЕЛГЕН CSV · ОҚУ ДЕМОСЫ</div>
-        <div class="nw-hero-title">Желі ағындарын<br>бір жерден шолыңыз.</div>
-        <div class="nw-hero-desc">Жүйе файлдағы қосылымдарды талдайды. Белгіленген деректе үш модель салыстырылады; белгі жоқ болса, Isolation Forest ерекше ағындарды жеке көрсетеді. Бұл нақты уақыттағы мониторинг емес.</div>
-        <div class="nw-hero-points"><span class="nw-hero-point">CSV дерегі</span><span class="nw-hero-point">3 модель салыстыруы</span><span class="nw-hero-point">Бөлек ескерту тізімі</span></div>
-      </div>
-      <img class="nw-hero-art" alt="Голографиялық планета мен желі байланыстарын көрсететін иллюстрация" src="data:image/svg+xml;base64,{hero_b64}" />
-    </section>
-    """, unsafe_allow_html=True)
 
 if page == "Жоба жайлы":
     st.markdown("### Құралдың мақсаты")
@@ -219,18 +207,26 @@ if page == "Деректер зертханасы":
 # Main overview
 numeric = df.select_dtypes(include=np.number).replace([np.inf, -np.inf], np.nan)
 label_candidates = [c for c in df.columns if c.lower() in {"label", "class", "attack", "target", "category"}]
-with st.expander("Сүзгілер мен талдау параметрлері", expanded=True):
-    label_col = st.selectbox("Класс немесе шабуыл белгісі бар баған", ["Белгісіз аномалияны іздеу"] + list(df.columns), index=(1 + df.columns.get_loc(label_candidates[0])) if label_candidates else 0)
-    max_rows = st.slider("Модельге алынатын жол саны", 1000, 30000, 12000, 1000)
+with st.container(border=True):
+    st.markdown("**Сүзгілер**")
+    filter_label, filter_rows, filter_normal = st.columns([1.35, 1.1, 1.25], vertical_alignment="bottom")
+    with filter_label:
+        label_col = st.selectbox("Талдау режимі немесе класс бағаны", ["Белгісіз аномалияны іздеу"] + list(df.columns), index=(1 + df.columns.get_loc(label_candidates[0])) if label_candidates else 0)
+    with filter_rows:
+        max_rows = st.select_slider("Талдауға алынатын жол", options=[1000, 5000, 12000, 20000, 30000], value=12000, format_func=lambda value: f"{value:,}")
     normal_label = None
     if label_col != "Белгісіз аномалияны іздеу":
         label_values = sorted(df[label_col].dropna().astype(str).unique().tolist())
-        normal_candidates = {"BENIGN", "BENIGN TRAFFIC", "NORMAL", "NORMAL TRAFFIC", "0"}
+        normal_candidates = {"BENIGN", "BENIGN TRAFFIC", "NORMAL", "NORMAL TRAFFIC", "0", "ҚАЛЫПТЫ"}
         detected_normal = next((v for v in label_values if v.strip().upper() in normal_candidates), None)
         normal_options = ["Автоматты анықтау"] + label_values
         default_index = normal_options.index(detected_normal) if detected_normal in normal_options else 0
-        normal_label = st.selectbox("Қалыпты трафиктің белгісі", normal_options, index=default_index,
-                                    help="Осы кластан бөлек болжанған нәтижелер күдікті жағдайлар тізімінде көрсетіледі.")
+        with filter_normal:
+            normal_label = st.selectbox("Қалыпты трафик класы", normal_options, index=default_index,
+                                        help="Осы кластан бөлек болжамдар күдікті тізімге шығады.")
+    else:
+        with filter_normal:
+            st.caption("Класс белгісі жоқ · аномалия іздеу режимі")
 
 has_label = label_col != "Белгісіз аномалияны іздеу"
 if has_label:
@@ -255,38 +251,47 @@ protocol_col = next((c for c in df.columns if c.strip().lower() in protocol_alia
 left, right = st.columns([1.45, 1], gap="large")
 with left:
     with st.container(border=True):
-        st.markdown("#### Трафик кластары")
+        st.markdown("#### Кластар бойынша қосылым саны")
         if has_label:
-            counts = df[label_col].fillna("Бос мән").astype(str).value_counts().head(12).rename_axis("Класс атауы").reset_index(name="Қосылым саны")
+            counts = df[label_col].fillna("Белгісіз").astype(str).value_counts().head(12).rename_axis("Класс атауы").reset_index(name="Қосылым саны")
             fig=px.bar(counts, x="Қосылым саны", y="Класс атауы", orientation="h", color="Қосылым саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
             fig.update_layout(coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
-            st.plotly_chart(style_fig(fig, 315), use_container_width=True)
+            st.plotly_chart(style_fig(fig, 300), use_container_width=True)
         elif not numeric.empty:
             feat=numeric.columns[:min(5,len(numeric.columns))].tolist()
             trend=df[feat].head(120).reset_index(drop=True).reset_index(names="Жол реті")
             fig=px.line(trend, x="Жол реті", y=feat, color_discrete_sequence=["#f15fca","#8b69ff","#5de0c7","#ffba69","#7aaeff"])
-            st.plotly_chart(style_fig(fig,315), use_container_width=True)
+            st.plotly_chart(style_fig(fig,300), use_container_width=True)
         else:
-            st.info("График құру үшін сандық бағандар қажет.")
+            st.info("Бұл файлда графикке жарайтын сандық баған жоқ.")
 with right:
     with st.container(border=True):
-        st.markdown("#### Желілік қызметтер")
-        service_col = port_col or protocol_col
-        if service_col:
-            service_title = "Тағайындалған порттар" if service_col == port_col else "Протоколдар"
-            services = df[service_col].fillna("Белгісіз").astype(str).value_counts().head(10).rename_axis("Қызмет").reset_index(name="Қосылым саны")
-            service_fig = px.bar(services, x="Қосылым саны", y="Қызмет", orientation="h", color="Қосылым саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
-            service_fig.update_layout(title=service_title, coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
-            st.plotly_chart(style_fig(service_fig,260), use_container_width=True)
-            st.caption("Ең жиі кездесетін 10 мән.")
-        elif has_label:
-            counts=df[label_col].fillna("Белгісіз").astype(str).value_counts()
-            pie=go.Figure(go.Pie(labels=counts.index[:8],values=counts.values[:8],hole=.72,marker_colors=["#ff62c7","#9567f5","#62e9d0","#ffbd69","#679aff","#bf71ff","#e8818f","#708295"],textinfo="label+percent"))
-            pie.add_annotation(text=f"{len(df):,}<br><span style='font-size:10px'>жол</span>",x=.5,y=.5,showarrow=False,font=dict(size=23,color="#fff0ff"))
-            st.plotly_chart(style_fig(pie,260), use_container_width=True)
-            st.caption("Деректегі класс үлесі.")
+        st.markdown("#### Желі белсенділігінің күйі")
+        if page == "Басты бет":
+            st.markdown(f'<img class="nw-panel-art" alt="Желі байланыстары бейнеленген голографиялық планета" src="data:image/svg+xml;base64,{hero_b64}">', unsafe_allow_html=True)
+        if has_label:
+            display_labels = df[label_col].fillna("Белгісіз").astype(str)
+            normal_candidates = {"BENIGN", "BENIGN TRAFFIC", "NORMAL", "NORMAL TRAFFIC", "0", "ҚАЛЫПТЫ"}
+            chart_normal = normal_label if normal_label and normal_label != "Автоматты анықтау" else next((v for v in display_labels.unique() if v.strip().upper() in normal_candidates), None)
+            if chart_normal:
+                other_share = (display_labels != str(chart_normal)).mean()
+                st.metric("Қалыпты кластан тыс үлес", f"{other_share:.1%}")
+                st.caption("Файлдағы класс белгісі бойынша есептелген. Бұл модель болжамы емес.")
+            else:
+                st.info("Қалыпты трафик класы анықталмады. Оны сүзгіден таңдаңыз.")
         else:
-            st.markdown("<div class='nw-card'><div class='nw-kicker'>ТАҢДАЛҒАН ӘДІС</div><h2 style='margin:.6rem 0;color:#49365f'>Isolation Forest</h2><div class='nw-note'>Белгі қойылмаған трафиктен өзгеше ағындарды анықтап, тексеру тізіміне қосады.</div></div>", unsafe_allow_html=True)
+            st.markdown("**Isolation Forest**")
+            st.caption("Белгіленбеген деректерден өзгеше қосылымдарды іздейді. Талдау үшін төмендегі батырманы басыңыз.")
+
+service_col = port_col or protocol_col
+if service_col:
+    with st.container(border=True):
+        service_title = "Жиі кездесетін тағайындалған порттар" if service_col == port_col else "Протоколдар бойынша қосылым саны"
+        st.markdown(f"#### {service_title}")
+        services = df[service_col].fillna("Белгісіз").astype(str).value_counts().head(10).rename_axis("Мән").reset_index(name="Қосылым саны")
+        service_fig = px.bar(services, x="Қосылым саны", y="Мән", orientation="h", color="Қосылым саны", color_continuous_scale=[[0,"#7045a7"],[1,"#ff62c7"]], text_auto=".2s")
+        service_fig.update_layout(coloraxis_showscale=False, yaxis={"categoryorder":"total ascending"})
+        st.plotly_chart(style_fig(service_fig,240), use_container_width=True)
 
 st.markdown("#### Модель нәтижелері")
 run = st.button("Талдауды бастау", type="primary", use_container_width=False)
