@@ -108,7 +108,7 @@ st.markdown("<div class='nw-title'>Қауіпті ерте байқа.</div><div
 st.markdown(f"<div style='margin:14px 0 20px'><span class='nw-chip'>◉ {data_origin}</span>　<span class='nw-chip'>MODEL LAB · v1</span></div>", unsafe_allow_html=True)
 
 if page == "Жоба туралы":
-    st.markdown("### Неге бұл құрал хэрэгтэй?")
+    st.markdown("### Неге бұл құрал пайдалы?")
     st.write("Nightwatch желілік қосылымдардың сипаттамаларын қарап, күмәнді ағындарды маманның назарына ұсынады. Бұл оқу жобасының прототипі: ол трафикті автоматты түрде тоқтатпайды және нақты қауіпсіздік өнімі ретінде тексерілмеген.")
     st.markdown("#### Жоба ағыны")
     st.write("1. CSV трафик дерегін жүктеу.  2. Белгіленген деректе бірнеше классификаторды салыстыру.  3. Белгі жоқ деректе Isolation Forest арқылы ықтимал аномалияларды табу.")
