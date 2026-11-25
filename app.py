@@ -88,11 +88,31 @@ def make_demo_data(n: int = 1800) -> pd.DataFrame:
                          "Label": np.where(y == 1, "Attack", "Benign")})
 
 @st.cache_data(show_spinner=False)
-def read_csv_bytes(data: bytes) -> pd.DataFrame:
+def read_csv_bytes(data: bytes, sample_limit: int = 50000) -> tuple[pd.DataFrame, int, bool]:
+    """Read large CSVs in chunks and keep a reproducible sample for the interactive analysis."""
+    if len(data) <= 50 * 1024 * 1024:
+        try:
+            frame = pd.read_csv(io.BytesIO(data), low_memory=False)
+        except UnicodeDecodeError:
+            frame = pd.read_csv(io.BytesIO(data), encoding="latin-1", low_memory=False)
+        return frame, len(frame), False
+
+    def sampled_chunks(encoding: str | None) -> tuple[pd.DataFrame, int]:
+        pieces = []
+        total_rows = 0
+        for chunk in pd.read_csv(io.BytesIO(data), chunksize=100_000, low_memory=False, encoding=encoding):
+            total_rows += len(chunk)
+            pieces.append(chunk.sample(n=min(2000, len(chunk)), random_state=42))
+        return pd.concat(pieces, ignore_index=True), total_rows
+
     try:
-        return pd.read_csv(io.BytesIO(data), low_memory=False)
+        frame, total_rows = sampled_chunks("utf-8")
     except UnicodeDecodeError:
-        return pd.read_csv(io.BytesIO(data), encoding="latin-1", low_memory=False)
+        frame, total_rows = sampled_chunks("latin-1")
+    sampled = len(frame) > sample_limit or total_rows > sample_limit
+    if len(frame) > sample_limit:
+        frame = frame.sample(n=sample_limit, random_state=42)
+    return frame.reset_index(drop=True), total_rows, sampled
 
 
 def style_fig(fig, height=270):
@@ -116,7 +136,8 @@ with st.sidebar:
 
 if uploaded:
     try:
-        df = read_csv_bytes(uploaded.getvalue())
+        with st.spinner("Үлкен CSV файлы жадқа үнемді түрде оқылып жатыр…"):
+            df, source_rows, was_sampled = read_csv_bytes(uploaded.getvalue())
         df.columns = [str(c).strip() for c in df.columns]
         data_origin = f"Жүктелген файл · {uploaded.name}"
     except Exception as exc:
@@ -124,6 +145,7 @@ if uploaded:
         st.stop()
 else:
     df = make_demo_data()
+    source_rows, was_sampled = len(df), False
     data_origin = "Синтетикалық демо дерек"
 
 # Drop empty and duplicate columns safely; preserve the unmodified row index for display.
@@ -133,6 +155,8 @@ df = df.dropna(axis=1, how="all")
 st.markdown("<div class='nw-kicker'>КИБЕРҚАУІПСІЗДІК · MACHINE LEARNING</div>", unsafe_allow_html=True)
 st.markdown("<div class='nw-title'>Қауіпті ерте байқа.</div><div class='nw-sub'>Желі белсенділігін бақыла · аномалияны анықта · әрекет ет</div>", unsafe_allow_html=True)
 st.markdown(f"<div style='margin:14px 0 20px'><span class='nw-chip'>◉ {data_origin}</span>　<span class='nw-chip'>MODEL LAB · v1</span></div>", unsafe_allow_html=True)
+if was_sampled:
+    st.info(f"Файл көлемі үлкен болғандықтан, талдау үшін {len(df):,} жол кездейсоқ іріктелді (файлда барлығы {source_rows:,} жол). Метрикалар осы іріктемеге есептеледі.")
 
 if page == "Шолу":
     hero_path = Path(__file__).parent / "assets" / "orbit-hero.svg"
