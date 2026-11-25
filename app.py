@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import time
+import base64
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -47,6 +49,29 @@ footer{visibility:hidden}
 </style>
 """, unsafe_allow_html=True)
 
+# The home screen follows the reference's airy holographic-lab look.
+st.markdown("""
+<style>
+.stApp{background:radial-gradient(ellipse at 77% 15%,rgba(208,184,245,.32),transparent 34%),linear-gradient(145deg,#f6f3fb,#eff2f9 55%,#f4eff8)!important;color:#352746!important}
+[data-testid="stSidebar"]{background:linear-gradient(180deg,#fdfbff,#f2eef8)!important;border-right:1px solid #e2d9ed!important}
+[data-testid="stSidebar"] *{color:#55466b!important}
+[data-testid="stMetric"]{background:rgba(255,255,255,.78)!important;border:1px solid #e5dced!important;box-shadow:0 12px 32px rgba(88,66,117,.08)!important}
+[data-testid="stMetricLabel"]{color:#786889!important}[data-testid="stMetricValue"]{color:#352746!important}
+[data-testid="stFileUploader"]{background:rgba(255,255,255,.72)!important;border:1px dashed #c4add9!important}
+[data-testid="stDataFrame"]{border:1px solid #e4dced!important}
+.nw-kicker{color:#8a63ac!important}.nw-title{color:#352746!important}.nw-sub{color:#776989!important}
+.nw-chip{border-color:#e3d8ed!important;background:rgba(255,255,255,.6)!important;color:#68547d!important}
+.nw-card{background:rgba(255,255,255,.7)!important;border-color:#e3d8ed!important}.nw-note{color:#786b84!important}
+.nw-hero{display:grid;grid-template-columns:.86fr 1.14fr;gap:14px;align-items:center;margin:10px 0 24px;padding:28px 30px;border:1px solid rgba(255,255,255,.92);border-radius:28px;background:linear-gradient(125deg,rgba(255,255,255,.88),rgba(246,239,252,.72) 55%,rgba(230,239,250,.76));box-shadow:0 20px 65px rgba(90,69,123,.12);overflow:hidden}
+.nw-hero-copy{padding:10px 0 12px 8px}.nw-hero-eyebrow{font:11px 'DM Mono',monospace;letter-spacing:2px;color:#936bac;text-transform:uppercase}
+.nw-hero-title{font-size:39px;line-height:1.12;letter-spacing:-1.7px;font-weight:800;color:#38294c;margin:16px 0 14px}
+.nw-hero-desc{font-size:14px;line-height:1.75;color:#786989;max-width:430px}
+.nw-hero-points{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.nw-hero-point{border:1px solid #e6dced;background:rgba(255,255,255,.58);border-radius:20px;padding:8px 11px;font-size:10px;color:#735d87}
+.nw-hero-art{width:100%;height:auto;display:block;filter:drop-shadow(0 16px 30px rgba(102,77,143,.13));border-radius:22px}
+@media(max-width:850px){.nw-hero{grid-template-columns:1fr;padding:20px}.nw-hero-title{font-size:31px}}
+</style>
+""", unsafe_allow_html=True)
+
 @st.cache_data(show_spinner=False)
 def make_demo_data(n: int = 1800) -> pd.DataFrame:
     """Create clearly labelled synthetic flows so the app works before a CSV is uploaded."""
@@ -72,21 +97,23 @@ def read_csv_bytes(data: bytes) -> pd.DataFrame:
 
 def style_fig(fig, height=270):
     fig.update_layout(height=height, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(family="Manrope", color="#cdbbd7", size=11),
-                      margin=dict(l=8, r=8, t=12, b=8), legend=dict(font=dict(color="#cdbbd7")))
-    fig.update_xaxes(gridcolor="rgba(150,110,170,.12)", zerolinecolor="rgba(150,110,170,.12)")
-    fig.update_yaxes(gridcolor="rgba(150,110,170,.12)", zerolinecolor="rgba(150,110,170,.12)")
+                      font=dict(family="Manrope", color="#6f607f", size=11),
+                      margin=dict(l=8, r=8, t=12, b=8), legend=dict(font=dict(color="#6f607f")))
+    fig.update_xaxes(gridcolor="rgba(118,96,140,.14)", zerolinecolor="rgba(118,96,140,.14)")
+    fig.update_yaxes(gridcolor="rgba(118,96,140,.14)", zerolinecolor="rgba(118,96,140,.14)")
     return fig
 
 with st.sidebar:
     st.markdown("<div style='display:flex;align-items:center;gap:10px;margin:8px 2px 28px'><div style='background:linear-gradient(135deg,#ff62c7,#9462f6);border-radius:12px;width:36px;height:36px;display:grid;place-items:center;color:white;font-size:20px'>◈</div><div><b style='font-size:16px;letter-spacing:1px'>NIGHTWATCH</b><br><span style='font-size:9px;letter-spacing:1.5px;color:#9e85ac'>NETWORK INTELLIGENCE</span></div></div>", unsafe_allow_html=True)
     st.caption("МОНИТОРИНГ")
     page = st.radio("Навигация", ["Шолу", "Деректер зертханасы", "Жоба туралы"], label_visibility="collapsed")
+    st.markdown("**Дерек файлы**")
+    uploaded = st.file_uploader("CSV файлды жүктеу", type=["csv"], help="CIC-IDS2017 сияқты flow деректерінің CSV файлы", label_visibility="collapsed", key="traffic_csv")
+    st.caption("Файл осы құрылғыда талданады.")
     st.divider()
     st.markdown("**◉ Қорғаныс белсенді**")
     st.caption("Оқу жобасының интерактивті демосы")
 
-uploaded = st.file_uploader("Желі трафигінің CSV файлын жүктеу", type=["csv"], help="CIC-IDS2017 сияқты flow деректерінің CSV файлын таңдаңыз. Файл осы құрылғыда өңделеді.")
 if uploaded:
     try:
         df = read_csv_bytes(uploaded.getvalue())
@@ -106,6 +133,21 @@ df = df.dropna(axis=1, how="all")
 st.markdown("<div class='nw-kicker'>КИБЕРҚАУІПСІЗДІК · MACHINE LEARNING</div>", unsafe_allow_html=True)
 st.markdown("<div class='nw-title'>Қауіпті ерте байқа.</div><div class='nw-sub'>Желі белсенділігін бақыла · аномалияны анықта · әрекет ет</div>", unsafe_allow_html=True)
 st.markdown(f"<div style='margin:14px 0 20px'><span class='nw-chip'>◉ {data_origin}</span>　<span class='nw-chip'>MODEL LAB · v1</span></div>", unsafe_allow_html=True)
+
+if page == "Шолу":
+    hero_path = Path(__file__).parent / "assets" / "orbit-hero.svg"
+    hero_b64 = base64.b64encode(hero_path.read_bytes()).decode("ascii")
+    st.markdown(f"""
+    <section class="nw-hero">
+      <div class="nw-hero-copy">
+        <div class="nw-hero-eyebrow">NETWORK INTELLIGENCE · LIVE VIEW</div>
+        <div class="nw-hero-title">Желі әлемін<br>қауіптен қорға.</div>
+        <div class="nw-hero-desc">Nightwatch желі ағындарын зерттеп, әдеттен тыс белсенділікті байқатады. Деректі жүкте де, модельдің күмәнді деп тапқан қосылымдарын бір панельден қара.</div>
+        <div class="nw-hero-points"><span class="nw-hero-point">✦ Аномалия радары</span><span class="nw-hero-point">◌ ML талдауы</span><span class="nw-hero-point">⌁ Интерактивті график</span></div>
+      </div>
+      <img class="nw-hero-art" alt="Голографиялық планета мен желі байланыстарын көрсететін иллюстрация" src="data:image/svg+xml;base64,{hero_b64}" />
+    </section>
+    """, unsafe_allow_html=True)
 
 if page == "Жоба туралы":
     st.markdown("### Неге бұл құрал пайдалы?")
@@ -234,4 +276,5 @@ if run:
 
 st.divider()
 st.markdown("<div class='nw-note'>Оқу жобасының прототипі · Күмәнді белгі қосымша тексеруді қажет етеді. Сандық мәндер нақты файлды талдағаннан кейін есептеледі.</div>",unsafe_allow_html=True)
+
 
